@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 配置redis连接密码 -->
+	<bean id="redisPassword"
+		class="org.springframework.data.redis.connection.RedisPassword">
+		<constructor-arg name="thePassword" value="123456" />
+	</bean>
+
+	<!--设置jedisPool链接池的配置 -->
+	<bean id="jedisPoolConfig"
+		class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="${jedis.maxTotal}" />
+		<property name="maxIdle" value="${jedis.maxIdle}" />
+		<property name="minIdle" value="${jedis.minIdle}" />
+		<property name="maxWaitMillis" value="${jedis.maxWaitMillis}" />
+		<property name="testWhileIdle" value="${jedis.testWhileIdle}" />
+		<property name="timeBetweenEvictionRunsMillis"
+			value="${jedis.timeBetweenEvictionRunsMillis}" />
+		<property name="testOnBorrow" value="${jedis.testOnBorrow}" />
+		<property name="testOnReturn" value="${jedis.testOnReturn}" />
+	</bean>
+
+	<bean id="redisStandaloneConfiguration"
+		class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+		<property name="hostName" value="${jedis.host}" />
+		<property name="port" value="${jedis.port}" />
+		<property name="password" ref="redisPassword" />
+		<!-- 设置使用Redis的哪个数据库 -->
+		<property name="database" value="${jedis.dbIndex}" />
+	</bean>
+
+	<bean id="redisConnectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<constructor-arg name="standaloneConfig"
+			ref="redisStandaloneConfiguration" />
+	</bean>
+
+	<bean id="stringRedisSerializer"
+		class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+	<bean id="jdkSerializationRedisSerializer"
+		class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+
+	<bean id="redisTemplate"
+		class="org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory"
+			ref="redisConnectionFactory" />
+
+		<!--的key和value的序列化方式 -->
+		<property name="keySerializer" ref="stringRedisSerializer" />
+		<property name="valueSerializer"
+			ref="jdkSerializationRedisSerializer" />
+		<property name="hashKeySerializer"
+			ref="stringRedisSerializer" />
+		<property name="hashValueSerializer"
+			ref="jdkSerializationRedisSerializer" />
+	</bean>
+
+</beans>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu118.mapper.EmployeeMapper">
+	<resultMap id="EmployeeResultMap"
+		type="com.edu118.entity.Employee">
+		<result column="eid" property="eid" />
+		<result column="lid" property="lid" />
+		<result column="did" property="did" />
+		<result column="ename" property="ename" />
+		<result column="sal" property="sal" />
+		<result column="phone" property="phone" />
+		<result column="password" property="password" />
+		<result column="photo" property="photo" />
+		<result column="note" property="note" />
+		<result column="hiredate" property="hiredate" />
+		<result column="ineid" property="ineid" />
+		<result column="enum" property="empNumber" />
+		<result column="locked" property="locked" />
+	</resultMap>
+	<select id="findRolesByEid" resultType="String">
+		SELECT rid FROM dept_role WHERE did = #{did}
+	</select>
+	<select id="findPermissionByEid" resultType="String">
+		SELECT pid FROM `permission` WHERE rid IN(
+		SELECT rid FROM dept_role WHERE did = #{did}
+		)
+	</select>
+
+</mapper>

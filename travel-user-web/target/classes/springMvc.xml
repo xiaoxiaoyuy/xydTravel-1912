@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<context:annotation-config />
+	<context:component-scan
+		base-package="com.edu118" />
+
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+
+	<!-- 文件上传的约束设置 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="102400" />
+		<property name="maxInMemorySize" value="2097152"></property>
+	</bean>
+
+	<!-- shiro注解启用 -->
+	<bean
+		class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor">
+		<property name="proxyTargetClass" value="true" />
+	</bean>
+	<bean
+		class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+	<!-- Dubbo配置 -->
+	<!-- 给当前的项目在Zookeeper中定义一个名称，一般都是使用项目名，用来计算依赖关系 -->
+	<dubbo:application name="travel-user-web" />
+
+	<!-- 使用multicast广播注册中心暴露服务地址 -->
+	<dubbo:registry
+		address="zookeeper://192.168.44.130:2181" />
+
+	<!-- 使用dubbo协议在20880端口暴露服务 -->
+	<dubbo:protocol name="dubbo" port="20880" />
+
+	<!-- 把服务进行注册，也叫做暴露，向外暴露出可用的服务以接口的方式向外暴露， 接口对象指向的是具体的实现类 -->
+	<dubbo:service ref="employeeService"
+		interface="com.edu118.service.IEmployeeService" />
+
+	<!-- 开启dubbo注解应用 -->
+	<dubbo:annotation package="com.edu118.service"/>
+
+	<!-- 加载配置请求路径及相应的页面的配置文件 -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<array>
+				<value>config/goPages</value>
+			</array>
+		</property>
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="cacheSeconds" value="120" />
+	</bean>
+
+</beans>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<context:component-scan base-package="com.edu118" />
+	<!-- 注入验证的Realm -->
+	<bean id="shiroRealm" class="com.edu118.shiro.ShiroRealm" >
+		<property name="employeeService" ref="employeeService"></property>
+	</bean>
+
+	<!-- 启用SessionDao -->
+	<bean id="sessionDAO" class="org.crazycake.shiro.RedisSessionDAO">
+		<property name="redisManager" ref="redisManager"/>
+	</bean>
+
+	<!-- 绑定自定义的SessionManager，告诉Shiro有这个类 -->
+	<bean id="sessionManager" class="com.edu118.shiro.CustomSessionManager">
+		<!-- 设置sessionId的过期时间，默认时间是30分钟，单位：毫秒  -->
+		<!-- <property name="globalSessionTimeout" value=""></property> -->
+		
+		<property name="sessionDAO" ref="sessionDAO"/>
+	</bean>
+	
+	<bean id="redisManager" class="org.crazycake.shiro.RedisManager">
+		<property name="host" value="${jedis.host}:${jedis.port}"/>
+		<property name="password" value="${jedis.password}"/>
+		<property name="timeout" value="3000"></property>
+	</bean>
+	<!-- 启用CacheManager,让Shiro把缓存放到Redis中 -->
+	<bean id="cacheManager" class="org.crazycake.shiro.RedisCacheManager">
+		<property name="redisManager" ref="redisManager"/>
+		<property name="principalIdFieldName" value="eid"/>
+	</bean>
+	
+	<!-- 注入验证的管理者 -->
+	<bean id="securityManager"
+		class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="sessionManager" ref="sessionManager"/>
+		<property name="realm" ref="shiroRealm"/>
+	</bean>
+
+	<bean id="shiroFilter"
+		class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<!-- 未登陆跳转到指定的页面 -->
+		<property name="loginUrl" value="/login.jsp" />
+		<!-- 登陆成功跳转到的页面 -->
+		<property name="successUrl" value="/home.jsp" />
+		<!-- 角色和权限验证失败跳转的页面 -->
+		<property name="unauthorizedUrl" value="/unauthorized.jsp" />
+
+		<!-- 自定义使用过滤器 -->
+		<!-- <property name="filters"> <util:map> <entry key="anAlias" value-ref="someFilter"/> 
+			</util:map> </property> -->
+
+		<!-- 设置拦截验证的路径 这是验证的方式之一 只有使用这种方式，前面的三个跳转才有效果，如果是使用注解验证，跳转无效 -->
+		<!-- <property name="filterChainDefinitions"> <value> # some example chain 
+			definitions: /admin/** = authc, roles[admin] /docs/** = authc, perms[document:read] 
+			/** = authc # more URL-to-FilterChain definitions here </value> </property> -->
+	</bean>
+
+	<!-- shiro的生命周期管理 -->
+	<bean id="lifecycleBeanPostProcessor"
+		class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+</beans>
