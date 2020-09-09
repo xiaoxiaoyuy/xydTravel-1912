@@ -17,7 +17,7 @@
 		<mybatis-version>3.5.4</mybatis-version>
 		<jackson.version>2.9.0</jackson.version>
 		<log4j2-version>2.13.2</log4j2-version>
-		<validator-version>5.4.1.Final</validator-version>
+		<validator-version>5.4.2.Final</validator-version>
 		<fastjson.version>1.2.66</fastjson.version>
 		<jstl.version>1.1.2</jstl.version>
 		<servlet.version>3.1.0</servlet.version>
