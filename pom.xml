@@ -21,7 +21,7 @@
 		<fastjson.version>1.2.66</fastjson.version>
 		<jstl.version>1.1.2</jstl.version>
 		<servlet.version>3.1.0</servlet.version>
-		<shiro-version>1.5.3</shiro-version>
+		<shiro-version>1.7.1</shiro-version>
 		<jedis-version>3.3.0</jedis-version>
 		<spring-data-version>2.3.0.RELEASE</spring-data-version>
 	</properties>
